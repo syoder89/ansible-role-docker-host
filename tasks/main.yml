@@ -78,3 +78,9 @@
   tags:
     - docker
     - docker-host
+
+- name: Add user to docker group
+  user:
+    name: "{{ remote_user }}"
+    group: "docker"
+    append: yes
