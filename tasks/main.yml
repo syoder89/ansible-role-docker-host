@@ -11,27 +11,6 @@
     - docker
     - docker-host
 
-- name: Add the GPG Key for Docker
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-  tags:
-     - docker-host
-
-- name: add the Docker repository
-  apt_repository:
-    repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-  register: docker_repo
-  tags:
-     - docker-host
-
-- name: update the apt cache
-  apt: update_cache=yes
-  tags:
-    - docker
-    - docker-host
-
 - name: Enable ipv4 forwarding
   sysctl: name=net.ipv4.conf.default.forwarding value=1 state=present
   tags:
@@ -44,26 +23,14 @@
     - docker
     - docker-host
 
-- name: remove any old Docker versions
+- name: Install Containerd
   apt:
-    name: ['docker', 'docker-engine', 'docker.io', 'containerd', 'runc']
-    state: absent
-  tags:
-     - docker-host
-
-- name: Install Docker
-  apt:
-    name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+    name: ['containerd.io']
     state: present
   tags:
      - docker-host
 
-- name: Install Docker-Compose
-  apt: name=docker-compose state=present
-  tags:
-     - docker-host
-
-- name: Re-enable the cri plugin for containerd
+- name: Re-enable the cri plugin and SystemdCgroup for containerd
   template: src=config.toml dest=/etc/containerd/config.toml
   register: containerd_config
   tags:
@@ -77,13 +44,6 @@
   tags:
     - docker-host
 
-- name: Make sure the docker py lib is installed
-  pip:
-    name: ['docker']
-    state: present
-  tags:
-    - docker-host
-
 - name: create the /apps directory
   file:
     path: /apps
@@ -93,8 +53,3 @@
     - docker
     - docker-host
 
-- name: Add user to docker group
-  user:
-    name: "{{ ansible_user }}"
-    group: "docker"
-    append: yes
