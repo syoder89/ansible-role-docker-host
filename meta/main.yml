@@ -1,0 +1,6 @@
+---
+galaxy_info:
+  author: syoder89 (Scott Yoder)
+  description: Role for installing a Docker on a host
+  company: ImageStream Internet Solutions, Inc.
+  min_ansible_version: 2.4
