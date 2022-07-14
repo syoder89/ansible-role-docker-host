@@ -63,6 +63,20 @@
   tags:
      - docker-host
 
+- name: Re-enable the cri plugin for containerd
+  template: src=config.toml dest=/etc/containerd/config.toml
+  register: containerd_config
+  tags:
+    - docker-host
+
+- name: Restart containerd if needed
+  when: containerd_config is changed
+  service: 
+    name: containerd
+    state: restarted
+  tags:
+    - docker-host
+
 - name: Make sure the docker py lib is installed
   pip:
     name: ['docker']
